@@ -1,0 +1,49 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+        
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+        
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Run linter
+        run: npm run lint
+        
+      - name: Run unit tests
+        run: npm test
+        
+      - name: Congratulate on successful pull request
+        if: success()
+        run: |
+          jokes=(
+            "Why don't scientists trust atoms? Because they make up everything!"
+            "Why did the bicycle fall over? Because it was two-tired!"
+            "What did one wall say to the other wall? I'll meet you at the corner!"
+            "Why did the tomato turn red? Because it saw the salad dressing!"
+            "What do you call a bear with no teeth? A gummy bear!"
+            "Why don't some couples go to the gym? Because some relationships don't work out!"
+            "What do you call a fake noodle? An impasta!"
+            "Why couldn't the leopard play hide-and-seek? Because he was always spotted!"
+            "Why don't skeletons fight each other? They don't have the guts!"
+            "How do you make a tissue dance? You put a little boogie in it!"
+          )
+          joke_index=$((GITHUB_RUN_NUMBER % ${#jokes[@]}))
+          echo "Congratulations on your successful pull request!"
+          echo "Here's a funny joke for you:"
+          echo "${jokes[$joke_index]}"
